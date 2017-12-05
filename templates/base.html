@@ -1,0 +1,136 @@
+
+<html>
+<head>
+
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+<!-- jQuery library -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+<!-- Latest compiled JavaScript -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<style>
+
+html {
+  position: relative;
+  min-height: 100%;
+}
+body {
+  /* Margin bottom by footer height 
+  margin-bottom: 50px;*/
+}
+.footer {
+  position: absolute;
+  bottom: 0;
+  margin-bottom: 0px;
+  width: 100%;
+  height: 5%;
+  color: white;
+  background: black;
+}
+
+
+div.jumbotron {
+      background: #3a6186; /* fallback for old browsers */
+  background: -webkit-linear-gradient(to left, #3a6186 , #89253e); /* Chrome 10-25, Safari 5.1-6 */
+  background: linear-gradient(to left, #3a6186 , #89253e); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+    height: 95%; 
+    color: white;
+    width: 100%;
+    text-shadow: black 0.3em 0.3em 0.3em;
+}
+  .navbar {
+    margin-bottom: 0px;
+}
+
+</style>
+</head>
+
+
+
+<body>
+  <nav class="navbar navbar-fixed-top navbar-inverse" style="background:black">
+    <div class="container-fluid">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+          <a class="navbar-brand" href="/" style="margin-left:20px"><b>TeachEdison</b></a>
+      </div>
+      <div class="collapse navbar-collapse" id="myNavbar">
+      </div>
+    </div>
+  </nav>
+
+  <div class="jumbotron">
+      <div class="container">
+        <center>
+          <br><br><br><br><br>
+          <h1>Want to recieve our newsletters? </h1><br>
+          <h4>Enter your email address to subscribe!</h4>
+          <br><br><br>
+          
+          <div class="col-md-3"></div>
+                <div class="col-md-6">
+                    <div class="input-group">
+                        <span class="input-group-addon"><i class="glyphicon glyphicon-envelope" aria-hidden="true"></i></span>
+                        <input type="text" class="form-control input-lg" name="email" id="email"  placeholder="Enter your Email"/>
+                    </div>
+                </div>
+                <div class="col-md-3"></div>
+        <br/><br/><br/>
+        <button class="btn btn-warning btn-lg" type="submit" onclick="add()">Subscribe Now!</button>
+          
+        </center>
+      </div>
+    </div>
+
+                <div class="footer">
+                  <br>
+                        <div class="text-center container">
+                            © Copyright 2017
+                        </div>
+                </div>
+
+<script>
+  
+  function validateEmail(email) {
+    var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    return re.test(email);
+}  
+  function add() {
+  
+    var emailid = document.getElementById("email").value;
+    
+    if(validateEmail(emailid)) {
+      var settings = {
+      "async": true,
+      "crossDomain": true,
+      "url": "https://api.sendgrid.com/v3/contactdb/recipients",
+      "method": "POST",
+      "headers": {
+        "authorization": "Bearer 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",
+        "content-type": "application/json"
+      },
+      "processData": false,
+      "data": "[{\"email\":\"" + emailid + "\"}]"
+    }
+
+      $.ajax(settings).done(function (response) {
+        alert("Email successfully added!")
+      });
+    }
+    else {
+      alert("Enter valid email address!");
+    }
+  }
+  
+  </script>
+</body>
+</html>

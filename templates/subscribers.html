@@ -1,0 +1,44 @@
+
+{% extends "dash.html"%}
+
+{% block content %}
+<script>
+  $(document).ready(function(){
+var settings = {
+  "async": true,
+  "crossDomain": true,
+  "url": "https://api.sendgrid.com/v3/contactdb/recipients",
+  "method": "GET",
+  "headers": {
+    "authorization": "Bearer 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"
+  },
+  "data": "{}"
+}
+
+$.ajax(settings).done(function (response) {
+      var count = response.recipient_count;
+      for(var i = 0; i < count; i++) {
+        var markup = "<tr><td>" + (i + 1) + "</td>" + "<td>" + response.recipients[i].email + "</td></tr>";
+        $("table tbody").append(markup);
+      }
+      
+});
+  });
+</script>
+<h1 class="text-center">Subscribers</h1>
+<h5 class="text-center">(Recently added subscribers might take some time to show.)</h5>
+<br><br>
+
+    
+<table id="table" class="text-center table table-striped">
+  <thead>
+    <tr>
+      <th class="col-md-4 text-center">S. No.</th>
+      <th class="col-md-8 text-center" scope="col">Email Address</th>
+    </tr>
+  </thead>
+  <tbody>
+  </tbody>
+</table>
+
+{% endblock %}

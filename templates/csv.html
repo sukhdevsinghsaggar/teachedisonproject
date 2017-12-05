@@ -1,0 +1,55 @@
+{% extends "dash.html"%}
+
+{% block content %}
+<center>
+<h1> Upload Contacts from CSV</h1>
+<br><br>
+
+  <div class="well">
+<input type="file" id="fileinput" />
+<script>
+  var output = "";
+  function addmulti() {
+      var settings = {
+      "async": true,
+      "crossDomain": true,
+      "url": "https://api.sendgrid.com/v3/contactdb/recipients",
+      "method": "POST",
+      "headers": {
+        "authorization": "Bearer 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",
+        "content-type": "application/json"
+      },
+      "processData": false,
+      "data": output
+      }
+    $.ajax(settings).done(function (response) {
+      alert("Contacts uploaded successfully!");
+    });
+    
+  }
+  function readSingleFile(evt) {
+    var f = evt.target.files[0]; 
+    if (f) {
+      var r = new FileReader();
+      r.onload = function(e) { 
+          var contents = e.target.result;
+          var lines = contents.split("\n");
+          output += "[";
+          for (var i=0; i<lines.length - 2; i++){
+            output += "{\"email\":\"" + lines[i].trim() + "\"},"   ;
+          }
+          output += "{\"email\":\"" + lines[lines.length - 2].trim() + "\"}" ;
+          output += "]";
+     }
+      r.readAsText(f);
+    } else { 
+      alert("Failed to load file");
+    }
+  }
+  document.getElementById('fileinput').addEventListener('change', readSingleFile);
+    </script>
+    
+</div>
+  <button type="button" class="btn btn-labeled btn-primary" onclick="addmulti()"> <span class="btn-label"><i class="glyphicon glyphicon-upload"></i> </span>Upload</button>
+</center>
+{% endblock %}
