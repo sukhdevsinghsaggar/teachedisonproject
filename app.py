@@ -8,15 +8,17 @@ from sqlalchemy.orm import sessionmaker
 from flask import session as login_session
 import random
 import string
-import http.client
 from functools import wraps
-import plotly.plotly as py
-import plotly.graph_objs as go
 import http.client
 import json
 import thread
 import requests
 from database_setup import Base,Mails
+from urlparse import urlparse
+from threading import Thread
+import httplib, sys
+import Queue
+
 
 app = Flask(__name__, static_folder="static")
 
@@ -26,20 +28,36 @@ Base.metadata.bind = engine
 DBSession = sessionmaker(bind=engine)
 session = DBSession()
 
+
 def getsub():
-    conn = http.client.HTTPSConnection("api.sendgrid.com")
+    conn = httplib.HTTPSConnection("api.sendgrid.com")
     payload = "{}"
-    headers = { 'authorization': "Bearer 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" }
+    headers = { 'authorization': "Bearer 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" }
     conn.request("GET", "/v3/contactdb/recipients", payload, headers)
     res = conn.getresponse()
     data = json.loads(res.read())
     count = data['recipient_count']
     content = data['recipients']
-    email = ""
-    for x in range (count - 1):
-      email += "{\"email\":\"" + content[x]['email'] + "\"},"
-    email += "{\"email\":\"" + content[count - 1]['email'] + "\"}"
+    email = Queue.Queue()
+    for x in range(count):
+        email.put(content[x]['email'])
     return email
+    
+      
+def send_email(subject, content):
+    email = getsub()
+    print email
+    for mailid in iter(email.get, None):
+        conn = httplib.HTTPSConnection("api.sendgrid.com")
+        payload = "{\"personalizations\":[{\"to\":[ {\"email\":\""+ mailid +"\"} ],\"subject\":\" " + subject + " \"}],\"from\":{\"email\":\"sukhe013@gmail.com\",\"name\":\"Sukhdev Singh\"},\"reply_to\":{\"email\":\"sukhe013@gmail.com\",\"name\":\"Sukhdev Singh\"},\"subject\":\" " + subject + "\",\"content\":[{\"type\":\"text/html\",\"value\":\"<html><p>" + content + "</p></html>\"}]}"
+        headers = {
+            'authorization': "Bearer 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",
+            'content-type': "application/json"
+        }
+        conn.request("POST", "/v3/mail/send", payload, headers)
+        res = conn.getresponse()
+        data = res.read()
+        print(data.decode("utf-8"))
 
 @app.route('/', methods=['GET', 'POST'])
 def homepage():
@@ -67,21 +85,13 @@ def send():
     if request.method == 'POST':
         subject = request.form['subject']
         content = request.form['Message']
-        conn = http.client.HTTPSConnection("api.sendgrid.com")
-        payload = "{\"personalizations\":[{\"to\":[ "+ getsub() +" ],\"subject\":\" " + subject + " \"}],\"from\":{\"email\":\"sukhdev3534@gmail.com\",\"name\":\"Sukhdev Singh\"},\"reply_to\":{\"email\":\"sukhdev3534@gmail.com\",\"name\":\"Sukhdev Singh\"},\"subject\":\" " + subject + "\",\"content\":[{\"type\":\"text/html\",\"value\":\"<html><p>" + content + "</p></html>\"}]}"
-        headers = {
-            'authorization': "Bearer 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",
-            'content-type': "application/json"
-        }
-        conn.request("POST", "/v3/mail/send", payload, headers)
-        res = conn.getresponse()
-        data = res.read()
+        thread.start_new_thread(send_email, (subject, content))
         newItem = Mails(subject=subject, body=content)
-        session.add(newItem)
+        session.add(newItem) 
         session.commit()
-        return render_template('send.html')
+        return render_template('send.html', msg="Your email will be delivered to the subscribers in the background!")
     else:
-        return render_template('send.html')
+        return render_template('send.html', msg="")
 
 if __name__ == '__main__':
     app.debug = True

@@ -30,8 +30,8 @@
                                 <h2>Time:</h2>
                                 <div class="btn-group">
                                     <select id="mySelect" class="btn btn-secondary btn-lg dropdown-toggle" style="border: solid 1px;border-radius: 25px;height:40px;width:225px">
-                                  <option value="week">Week</option>
                                   <option value="day">Day</option>
+                                  <option value="week">Week</option>
                                   <option value="month">Month</option>
                                 </select>
                                 </div>
@@ -55,12 +55,13 @@ function showdata() {
   "url": "https://api.sendgrid.com/v3/stats?limit=10&start_date=" + start + "&aggregated_by=" + type + "&end_date=" + end,
   "method": "GET",
   "headers": {
-    "authorization": "Bearer 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"
+    "authorization": "Bearer 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"
   },
   "data": "{}"
 }
 
 $.ajax(settings).done(function (response) {
+  console.log(response);
   var set = [];
   var label= [];
   for(var i = 0; i < response.length; i++) {
